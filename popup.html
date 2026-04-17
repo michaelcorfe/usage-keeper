@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Usage Keeper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #111113;
+      --bg-card: #18181b;
+      --bg-chip: #222226;
+      --bg-hover: #26262b;
+      --border: rgba(255,255,255,0.07);
+      --border-md: rgba(255,255,255,0.11);
+      --text: #ececec;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      --green: #22c55e;
+      --green-dim: rgba(34,197,94,0.12);
+      --amber: #f59e0b;
+      --amber-dim: rgba(245,158,11,0.12);
+      --red: #ef4444;
+      --red-dim: rgba(239,68,68,0.12);
+      --blue: #3b82f6;
+      --sans: 'Inter', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      width: 340px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 14px 11px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 5px;
+      background: #1a1a1a;
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pulse-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--text-muted);
+    }
+
+    .pulse {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .pulse.live { animation: blink 2s ease-in-out infinite; }
+    .pulse.stale { background: var(--amber); }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+
+    .btn-refresh {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border-md);
+      border-radius: 6px;
+      padding: 3px 9px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .btn-refresh:hover { color: var(--text); border-color: rgba(255,255,255,0.2); background: var(--bg-hover); }
+    .btn-refresh:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* CARDS */
+    .cards { padding: 10px 10px 4px; display: flex; flex-direction: column; gap: 6px; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 14px;
+      transition: border-color 0.15s;
+    }
+
+    .card:hover { border-color: var(--border-md); }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 11px;
+    }
+
+    .platform-left { display: flex; align-items: center; gap: 9px; }
+
+    .p-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .p-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .p-plan {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .pct-display { text-align: right; }
+
+    .pct-num {
+      font-size: 24px;
+      font-weight: 600;
+      font-family: var(--mono);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .pct-reset {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-family: var(--mono);
+      margin-top: 3px;
+    }
+
+    /* BAR */
+    .bar-wrap {
+      height: 6px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.7s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* META ROW */
+    .meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 9px;
+    }
+
+    .meta-label {
+      font-size: 10px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      letter-spacing: 0.02em;
+    }
+
+    .badge {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 99px;
+      font-family: var(--mono);
+    }
+
+    .badge-ok { background: var(--green-dim); color: var(--green); }
+    .badge-warn { background: var(--amber-dim); color: var(--amber); }
+    .badge-orange { background: rgba(249,115,22,0.12); color: #f97316; }
+    .badge-danger { background: var(--red-dim); color: var(--red); }
+
+    /* CHIPS */
+    .chips { display: flex; gap: 5px; }
+
+    .chip {
+      flex: 1;
+      background: var(--bg-chip);
+      border-radius: 6px;
+      padding: 6px 9px;
+    }
+
+    .chip-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      margin-bottom: 3px;
+    }
+
+    .chip-val {
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--mono);
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .weekly-reset {
+      margin-top: 8px;
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--text-dim);
+      text-align: right;
+    }
+
+    /* CONNECT BUTTON */
+    .connect-wrap { padding: 6px 10px 10px; }
+
+    .btn-connect {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 9px 14px;
+      background: transparent;
+      border: 1px dashed var(--border-md);
+      border-radius: 8px;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-connect:hover {
+      border-color: rgba(255,255,255,0.2);
+      color: var(--text);
+      background: var(--bg-hover);
+    }
+
+    .plus-icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid currentColor;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    /* CONNECT DRAWER */
+    .drawer {
+      border-top: 1px solid var(--border);
+      padding: 10px;
+      display: none;
+    }
+
+    .drawer.open { display: block; }
+
+    .drawer-title {
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 7px;
+      padding: 0 2px;
+    }
+
+    .drawer-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.15s;
+      margin-bottom: 5px;
+    }
+
+    .drawer-item:last-child { margin-bottom: 0; }
+    .drawer-item:hover { border-color: var(--border-md); color: var(--text); background: var(--bg-hover); }
+
+    .d-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .d-arrow { margin-left: auto; font-size: 11px; opacity: 0.4; }
+
+    /* FOOTER */
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px 11px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-sync {
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--text-dim);
+    }
+
+    .peak-tag {
+      font-size: 10px;
+      font-family: var(--mono);
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: var(--amber-dim);
+      color: var(--amber);
+    }
+
+    /* EMPTY */
+    .empty {
+      padding: 24px 20px 28px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .empty-icon {
+      margin-bottom: 4px;
+    }
+
+    .empty-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin: 0;
+    }
+
+    .empty-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .empty-btn {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 7px 16px;
+      background: none;
+      border: 1px solid var(--border-hover);
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: var(--sans);
+      color: var(--green);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .empty-btn:hover {
+      background: var(--green-dim);
+      border-color: var(--green);
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg width="22" height="22" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#34c78a"/>
+            <stop offset="45%" stop-color="#34c78a"/>
+            <stop offset="65%" stop-color="#f59e0b"/>
+            <stop offset="80%" stop-color="#f97316"/>
+            <stop offset="100%" stop-color="#ef4444"/>
+          </linearGradient>
+          <mask id="brand-mask">
+            <text x="64" y="76" font-family="Arial Black, sans-serif" font-size="66" font-weight="900" fill="white" text-anchor="middle" letter-spacing="-4">UK</text>
+          </mask>
+        </defs>
+        <rect width="128" height="128" rx="24" fill="#111111"/>
+        <rect x="0" y="0" width="128" height="128" rx="24" fill="url(#brand-grad)" mask="url(#brand-mask)"/>
+        <rect x="18" y="92" width="92" height="7" rx="3.5" fill="rgba(255,255,255,0.08)"/>
+        <rect x="18" y="92" width="92" height="7" rx="3.5" fill="url(#brand-grad)"/>
+      </svg>
+    </div>
+    <span class="brand-name">Usage Keeper</span>
+  </div>
+  <div class="header-actions">
+    <div class="pulse-wrap">
+      <div class="pulse live" id="pulse"></div>
+      <span id="pulseLabel">live</span>
+    </div>
+    <button class="btn-refresh" id="refreshBtn">Refresh</button>
+  </div>
+</div>
+
+<div id="content"></div>
+
+<div class="footer">
+  <span class="footer-sync" id="lastSync">syncing...</span>
+  <span class="peak-tag" id="peakTag" style="display:none">peak hours</span>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
